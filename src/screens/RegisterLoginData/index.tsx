@@ -1,21 +1,18 @@
-import React from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { useForm } from 'react-hook-form';
-import { RFValue } from 'react-native-responsive-fontsize';
-import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { KeyboardAvoidingView, Platform } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
 import uuid from 'react-native-uuid';
-
-import { Header } from '../../components/Header';
-import { Input } from '../../components/Form/Input';
+import * as Yup from 'yup';
 import { Button } from '../../components/Form/Button';
+import { Input } from '../../components/Form/Input';
+import { Header } from '../../components/Header';
+import { Container, Form } from './styles';
 
-import {
-  Container,
-  Form
-} from './styles';
+
 
 interface FormData {
   service_name: string;
@@ -48,6 +45,14 @@ export function RegisterLoginData() {
     }
 
     const dataKey = '@savepass:logins';
+    const savedData = JSON.parse(await AsyncStorage.getItem(dataKey));
+    const newData = [
+      ...savedData,
+      newLoginData
+    ]
+
+    await AsyncStorage.setItem(dataKey, JSON.stringify(newData));
+    navigate('Home');
 
     // Save data on AsyncStorage and navigate to 'Home' screen
   }
@@ -66,8 +71,8 @@ export function RegisterLoginData() {
             title="Nome do serviço"
             name="service_name"
             error={
+              errors.service_name && errors.service_name.message
               // Replace here with real content
-              'Has error ? show error message'
             }
             control={control}
             autoCapitalize="sentences"
@@ -78,8 +83,8 @@ export function RegisterLoginData() {
             title="E-mail"
             name="email"
             error={
+              errors.email && errors.email.message
               // Replace here with real content
-              'Has error ? show error message'
             }
             control={control}
             autoCorrect={false}
@@ -92,7 +97,7 @@ export function RegisterLoginData() {
             name="password"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              errors.password && errors.password.message
             }
             control={control}
             secureTextEntry
